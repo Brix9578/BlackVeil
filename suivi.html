@@ -55,7 +55,6 @@
         <h2>📡 Accès sécurisé</h2>
 
         <input type="text" id="name" placeholder="Nom RP">
-        <input type="text" id="phone" placeholder="Téléphone RP">
         <input type="text" id="ref" placeholder="Référence dossier">
 
         <button onclick="check()">Vérifier le statut</button>
@@ -70,7 +69,6 @@
     <script>
         function check() {
             const name = document.getElementById("name").value.trim();
-            const phone = document.getElementById("phone").value.trim();
             const ref = document.getElementById("ref").value.trim();
 
             if (!name || !phone || !ref) {
@@ -96,3 +94,4 @@
     </script>
 </body>
 </html>
+
