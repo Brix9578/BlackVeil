@@ -67,12 +67,18 @@
             history.pushState(null, "", location.href);
         };
     </script>
-    <script>
-    const ref = "BV-" + Math.random().toString(36).substring(2, 7).toUpperCase();
+   <script>
+const params = new URLSearchParams(window.location.search);
+const ref = params.get("ref");
+
+if (ref) {
     document.getElementById("ref").textContent = ref;
+}
 </script>
+
 
 </body>
 </html>
+
 
 
