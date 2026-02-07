@@ -172,7 +172,7 @@ document.getElementById("contract-form").addEventListener("submit", function(e){
         "Content-Type": "application/json"
     },
     body: JSON.stringify({
-        content: `🧾 **NOUVEAU CONTRAT RP**
+    content: `🧾 **NOUVEAU CONTRAT RP**
 
 🆔 Référence dossier : **${dossier}**
 
@@ -184,16 +184,13 @@ document.getElementById("contract-form").addEventListener("submit", function(e){
 ${details}
 
 ⏳ Statut : EN ATTENTE DE VALIDATION`
-    })
-}).then(() => {
-    window.location.href = "confirmation.html?ref=" + dossier;
-});
-
+})
 
 </script>
 
 </body>
 </html>
+
 
 
 
