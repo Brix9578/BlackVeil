@@ -122,7 +122,40 @@
 </footer>
 
 </body>
+    <script>
+document.body.classList.add("loading");
+
+const text = `
+Connexion au serveur sécurisé...
+Authentification...
+Accès autorisé ✔
+
+Bienvenue Agent.
+Chargement de Black Veil Agency...
+`;
+
+let i = 0;
+const speed = 35;
+const terminalText = document.getElementById("terminal-text");
+
+function typeWriter(){
+    if(i < text.length){
+        terminalText.innerHTML += text.charAt(i);
+        i++;
+        setTimeout(typeWriter, speed);
+    } else {
+        setTimeout(() => {
+            document.getElementById("terminal").style.display = "none";
+            document.body.classList.remove("loading");
+        }, 800);
+    }
+}
+
+typeWriter();
+</script>
+
 </html>
+
 
 
 
