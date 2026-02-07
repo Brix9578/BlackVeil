@@ -24,7 +24,8 @@
 <section>
     <h2>📡 Formulaire de commande RP</h2>
 
-    <form>
+    <form id="contract-form">
+
         <label>Nom RP</label>
         <input type="text" placeholder="Nom RP" required>
 
@@ -151,10 +152,43 @@ function typeWriter(){
 }
 
 typeWriter();
+
+document.getElementById("contract-form").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    const nom = document.querySelector('input[placeholder="Nom RP"]').value;
+    const contact = document.querySelector('input[placeholder="Téléphone / Message codé"]').value;
+    const type = document.querySelector('select').value;
+    const details = document.querySelector('textarea').value;
+
+    fetch("https://discord.com/api/webhooks/1469524195598663969/Lwd7LfBlLPROT9gKz-9iudeKR2HzNip0WmEuAKBFK9Sp5QM9-P62ING2ecI2sOKDKXBK", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+    content: `📡 **NOUVEAU CONTRAT RP**
+
+👤 Nom RP : ${nom}
+📞 Contact RP : ${contact}
+🎯 Type : ${type}
+
+📝 Détails :
+${details}
+
+⏳ Statut : EN ATTENTE DE VALIDATION`
+})
+
+    }).then(() => {
+        window.location.href = "confirmation.html";
+    });
+});
+
 </script>
 
 </body>
 </html>
+
 
 
 
