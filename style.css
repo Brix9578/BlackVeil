@@ -37,7 +37,8 @@ h2 {
 section {
     max-width: 900px;
     margin: auto;
-/* === GLITCH EFFECT === */
+
+    /* === GLITCH EFFECT === */
 .glitch {
     position: relative;
     color: #00ff99;
@@ -59,14 +60,14 @@ section {
 .glitch::before {
     left: 2px;
     text-shadow: -2px 0 red;
-    clip: rect(24px, 550px, 90px, 0);
+    clip: rect(24px, 9999px, 90px, 0);
     animation: glitch-anim 2s infinite linear alternate-reverse;
 }
 
 .glitch::after {
     left: -2px;
     text-shadow: -2px 0 cyan;
-    clip: rect(85px, 550px, 140px, 0);
+    clip: rect(85px, 9999px, 140px, 0);
     animation: glitch-anim2 3s infinite linear alternate-reverse;
 }
 
@@ -93,4 +94,3 @@ section {
     50% { transform: skew(1deg); }
     100% { transform: skew(-1deg); }
 }
-
