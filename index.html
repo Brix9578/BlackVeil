@@ -164,13 +164,17 @@ document.getElementById("contract-form").addEventListener("submit", function(e){
     const type = document.querySelector('select').value;
     const details = document.querySelector('textarea').value;
 
+    const dossier = "BV-" + Math.random().toString(36).substring(2, 7).toUpperCase();
+
     fetch("https://discord.com/api/webhooks/1469524195598663969/Lwd7LfBlLPROT9gKz-9iudeKR2HzNip0WmEuAKBFK9Sp5QM9-P62ING2ecI2sOKDKXBK", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-    content: `📡 **NOUVEAU CONTRAT RP**
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+        content: `📡 **NOUVEAU CONTRAT RP**
+
+🆔 Référence dossier : **${dossier}**
 
 👤 Nom RP : ${nom}
 📞 Contact RP : ${contact}
@@ -180,17 +184,16 @@ document.getElementById("contract-form").addEventListener("submit", function(e){
 ${details}
 
 ⏳ Statut : EN ATTENTE DE VALIDATION`
-})
-
-    }).then(() => {
-        window.location.href = "confirmation.html";
-    });
+    })
+}).then(() => {
+    window.location.href = "confirmation.html?ref=" + dossier;
 });
 
 </script>
 
 </body>
 </html>
+
 
 
 
