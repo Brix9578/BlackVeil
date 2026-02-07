@@ -166,13 +166,14 @@ document.getElementById("contract-form").addEventListener("submit", function(e){
 
     const dossier = "BV-" + Math.random().toString(36).substring(2, 7).toUpperCase();
 
-    fetch("https://discord.com/api/webhooks/1469524195598663969/Lwd7LfBlLPROT9gKz-9iudeKR2HzNip0WmEuAKBFK9Sp5QM9-P62ING2ecI2sOKDKXBK", {
+    fetch("TON_WEBHOOK_DISCORD_ICI", {
     method: "POST",
     headers: {
         "Content-Type": "application/json"
     },
     body: JSON.stringify({
-        content: `📡 **NOUVEAU CONTRAT RP**
+        content: 
+`🧾 **NOUVEAU CONTRAT RP**
 
 🆔 Référence dossier : **${dossier}**
 
@@ -189,10 +190,12 @@ ${details}
     window.location.href = "confirmation.html?ref=" + dossier;
 });
 
+
 </script>
 
 </body>
 </html>
+
 
 
 
