@@ -114,4 +114,24 @@ body.loading > *:not(#terminal){
     display:none;
 }
 
+.suivi-container {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.suivi-btn {
+    display: inline-block;
+    padding: 10px 22px;
+    border: 1px solid #00ff88;
+    color: #00ff88;
+    text-decoration: none;
+    font-family: monospace;
+    transition: 0.3s;
+}
+
+.suivi-btn:hover {
+    background: #00ff88;
+    color: #000;
+}
+
 
