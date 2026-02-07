@@ -37,6 +37,7 @@ h2 {
 section {
     max-width: 900px;
     margin: auto;
+}
 
  .glitch {
     position: relative;
@@ -82,3 +83,4 @@ section {
     75% { transform: translate(3px, 2px); }
     100% { transform: translate(0); }
 }
+
