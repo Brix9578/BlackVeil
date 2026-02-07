@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Suivi de dossier</title>
+    <style>
+        body {
+            background: #000;
+            color: #00ff88;
+            font-family: monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .box {
+            width: 320px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        input, button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            background: #111;
+            border: 1px solid #00ff88;
+            color: #00ff88;
+            font-family: monospace;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        #result {
+            margin-top: 20px;
+            min-height: 40px;
+        }
+
+        .small {
+            opacity: 0.6;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <h2>📡 Accès sécurisé</h2>
+
+        <input type="text" id="name" placeholder="Nom RP">
+        <input type="text" id="phone" placeholder="Téléphone RP">
+        <input type="text" id="ref" placeholder="Référence dossier">
+
+        <button onclick="check()">Vérifier le statut</button>
+
+        <div id="result"></div>
+
+        <div class="small">
+            Toute tentative de fraude est enregistrée.
+        </div>
+    </div>
+
+    <script>
+        function check() {
+            const name = document.getElementById("name").value.trim();
+            const phone = document.getElementById("phone").value.trim();
+            const ref = document.getElementById("ref").value.trim();
+
+            if (!name || !phone || !ref) {
+                document.getElementById("result").innerHTML =
+                    "<span style='color:#ff5555'>❌ Accès refusé – informations incomplètes</span>";
+                return;
+            }
+
+            const statuses = [
+                "🟡 EN ATTENTE DE VALIDATION",
+                "🟢 CONTRAT ACCEPTÉ",
+                "🔴 CONTRAT REFUSÉ"
+            ];
+
+            const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+
+            document.getElementById("result").innerHTML = `
+                <p>Dossier <strong>${ref}</strong></p>
+                <p>Statut :</p>
+                <strong>${randomStatus}</strong>
+            `;
+        }
+    </script>
+</body>
+</html>
