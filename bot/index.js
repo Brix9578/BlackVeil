@@ -1,5 +1,5 @@
 const express = require("express");
-const cors = require("cors"); // 👈 AJOUT ICI
+const cors = require("cors");
 
 const {
   Client,
@@ -102,6 +102,7 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log("🌐 Serveur web actif sur le port " + PORT);
 });
+
 
 
 
