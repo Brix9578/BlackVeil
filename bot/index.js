@@ -34,13 +34,14 @@ client.once("ready", () => {
   console.log("🤖 Bot Discord connecté");
 });
 
-client.login(process.env.DISCORD_TOKEN);
+client.login(process.env.DISCORD_TOKEN)
   .then(() => {
     console.log("✅ Login Discord OK");
   })
   .catch(err => {
     console.error("❌ ERREUR LOGIN DISCORD :", err);
   });
+
 
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isButton()) return;
@@ -99,8 +100,14 @@ app.post("/new-contract", async (req, res) => {
         .setStyle(ButtonStyle.Danger)
     );
 
-    await channel.send({ embeds: [embed], components: [row] });
+       await channel.send({ embeds: [embed], components: [row] });
     res.json({ status: "ok" });
+
+  } catch (err) {
+    console.error("❌ Erreur envoi Discord :", err);
+    res.status(500).json({ error: "Erreur Discord" });
+  }
+});
 
 // ✅ TOUJOURS À LA FIN
 const PORT = process.env.PORT || 10000;
