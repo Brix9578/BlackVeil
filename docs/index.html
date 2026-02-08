@@ -26,26 +26,44 @@
 
     <form id="form">
 
-        <label>Nom RP</label>
-        <input type="text" placeholder="Nom RP" required>
+  <label>Nom RP</label>
+  <input
+    type="text"
+    id="nom"
+    placeholder="Nom RP"
+    required
+  >
 
-        <label>Moyen de contact RP</label>
-        <input type="text" placeholder="Téléphone / Message codé">
+  <label>Moyen de contact RP</label>
+  <input
+    type="text"
+    id="contact"
+    placeholder="Téléphone / Message codé"
+    required
+  >
 
-        <label>Type de contrat</label>
-        <select>
-            <option>Menaces/Peur</option>
-            <option>Accident arrangé</option>
-            <option>Élimination rapide</option>
-            <option>Élimination avec client</option>
-            <option>Double cible</option>
-        </select>
+  <label>Type de contrat</label>
+  <select id="type" required>
+    <option value="">— Choisir —</option>
+    <option>Menaces / Peur</option>
+    <option>Accident arrangé</option>
+    <option>Élimination rapide</option>
+    <option>Élimination avec client</option>
+    <option>Double cible</option>
+  </select>
 
-        <label>Détails RP</label>
-        <textarea rows="5" placeholder="Informations RP uniquement"></textarea>
+  <label>Détails RP</label>
+  <textarea
+    id="details"
+    rows="5"
+    placeholder="Informations RP uniquement"
+    required
+  ></textarea>
 
-        <button type="submit">Envoyer la requête</button>
-    </form>
+  <button type="submit">📨 Envoyer la demande</button>
+
+</form>
+
 <div class="suivi-container">
     <a href="suivi.html" class="suivi-btn">📁 Suivi de dossier</a>
 </div>
@@ -189,6 +207,7 @@ document.getElementById("form").addEventListener("submit", function (e) {
 
 </body>
 </html>
+
 
 
 
