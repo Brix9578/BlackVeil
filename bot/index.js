@@ -33,6 +33,14 @@ const client = new Client({
 client.once("ready", () => {
   console.log("🤖 Bot Discord connecté");
 });
+client.once("ready", () => {
+  console.log("🤖 Bot Discord connecté");
+});
+
+client.on("error", console.error);
+client.on("shardError", console.error);
+
+console.log("Tentative de connexion à Discord...");
 
 client.login(process.env.DISCORD_TOKEN)
   .then(() => {
@@ -114,6 +122,7 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log("🌐 Serveur web actif sur le port " + PORT);
 });
+
 
 
 
