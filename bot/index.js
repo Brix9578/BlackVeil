@@ -23,7 +23,6 @@ app.use(express.json());
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages
   ]
 });
 
@@ -105,6 +104,7 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log("🌐 Serveur web actif sur le port " + PORT);
 });
+
 
 
 
