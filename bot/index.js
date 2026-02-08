@@ -22,6 +22,26 @@ client.once("ready", () => {
 
 client.login(process.env.DISCORD_TOKEN);
 
+client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isButton()) return;
+
+  if (interaction.customId === "accept") {
+    await interaction.update({
+      content: "✅ Contrat ACCEPTÉ",
+      embeds: [],
+      components: []
+    });
+  }
+
+  if (interaction.customId === "refuse") {
+    await interaction.update({
+      content: "❌ Contrat REFUSÉ",
+      embeds: [],
+      components: []
+    });
+  }
+});
+
 // ===== ROUTES WEB =====
 app.get("/", (req, res) => {
   res.send("Bot Black Veil Agency en ligne");
@@ -66,6 +86,12 @@ app.post("/new-contract", async (req, res) => {
     console.error("❌ Erreur envoi Discord :", err);
     res.status(500).json({ error: "Erreur Discord" });
   }
+const PORT = process.env.PORT || 10000;
+
+app.listen(PORT, () => {
+  console.log("🌐 Serveur web actif sur le port " + PORT);
 });
+
+
 
 
