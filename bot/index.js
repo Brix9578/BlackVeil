@@ -1,3 +1,6 @@
+console.log("🚀 index.js démarré");
+console.log("TOKEN PRESENT ?", !!process.env.DISCORD_TOKEN);
+
 const express = require("express");
 const cors = require("cors");
 
@@ -104,6 +107,7 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log("🌐 Serveur web actif sur le port " + PORT);
 });
+
 
 
 
