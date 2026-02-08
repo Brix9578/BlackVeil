@@ -1,13 +1,16 @@
 {
   "name": "black-veil-bot",
   "version": "1.0.0",
+  "description": "Bot Discord Black Veil Agency",
   "main": "index.js",
+  "type": "commonjs",
   "scripts": {
     "start": "node index.js"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
-    "discord.js": "^14.15.3",
-    "express": "^4.18.2",
-    "cors": "^2.8.5"
+    "discord.js": "^14.15.3"
   }
 }
