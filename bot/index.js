@@ -31,7 +31,7 @@ app.get("/", (req, res) => {
 app.post("/new-contract", async (req, res) => {
   console.log("📩 Nouveau contrat reçu :", req.body);
 
-  const channel = await client.channels.fetch("ID_DU_SALON_DISCORD");
+  const channel = await client.channels.fetch("1469524090946846904");
 
   const embed = new EmbedBuilder()
     .setTitle("📩 Nouveau contrat RP")
@@ -77,3 +77,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log("Serveur actif sur le port " + PORT);
 });
+
