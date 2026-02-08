@@ -10,11 +10,14 @@ const {
   EmbedBuilder
 } = require("discord.js");
 
+const app = express(); // ✅ OBLIGATOIRE AVANT app.use
+
 app.use(cors({
   origin: "https://brix9578.github.io"
 }));
 
 app.use(express.json());
+
 
 // ===== DISCORD BOT =====
 const client = new Client({
@@ -102,6 +105,7 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log("🌐 Serveur web actif sur le port " + PORT);
 });
+
 
 
 
