@@ -65,10 +65,10 @@ app.post("/new-contract", async (req, res) => {
     const embed = new EmbedBuilder()
       .setTitle("📩 Nouveau contrat RP")
       .addFields(
-        { name: "Nom RP", value: req.body.nom || "?" },
-        { name: "Contact", value: req.body.contact || "?" },
-        { name: "Type", value: req.body.type || "?" },
-        { name: "Détails", value: req.body.details || "Aucun" }
+        { name: "👤 Nom RP", value: req.body.nom || "?" },
+        { name: "📞 Contact", value: req.body.contact || "?" },
+        { name: "🎯 Type", value: req.body.type || "?" },
+        { name: "📄 Détails", value: req.body.details || "Aucun" }
       )
       .setColor(0x00ff88);
 
@@ -97,6 +97,7 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log("🌐 Serveur web actif sur le port " + PORT);
 });
+
 
 
 
