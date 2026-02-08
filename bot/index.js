@@ -1,4 +1,6 @@
 const express = require("express");
+const cors = require("cors"); // 👈 AJOUT ICI
+
 const {
   Client,
   GatewayIntentBits,
@@ -9,6 +11,7 @@ const {
 } = require("discord.js");
 
 const app = express();
+
 app.use(express.json());
 
 // ===== DISCORD BOT =====
@@ -97,6 +100,7 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log("🌐 Serveur web actif sur le port " + PORT);
 });
+
 
 
 
