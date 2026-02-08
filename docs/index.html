@@ -151,38 +151,33 @@ function typeWriter(){
 
 typeWriter();
 
-document.getElementById("contract-form").addEventListener("submit", function(e){
-    e.preventDefault();
+<script>
+document.getElementById("form").addEventListener("submit", function(e) {
+  e.preventDefault();
 
-    const nom = document.querySelector('input[placeholder="Nom RP"]').value;
-    const contact = document.querySelector('input[placeholder="Téléphone / Message codé"]').value;
-    const type = document.querySelector('select').value;
-    const details = document.querySelector('textarea').value;
+  const nom = document.getElementById("nom").value;
+  const contact = document.getElementById("contact").value;
+  const type = document.getElementById("type").value;
+  const details = document.getElementById("details").value;
 
-    const dossier = "BV-" + Math.random().toString(36).substring(2, 7).toUpperCase();
+  const dossier = Math.floor(Math.random() * 100000);
 
-    fetch("https://blackveil-bot.onrender.com", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            content: `🧾 **NOUVEAU CONTRAT RP**
-
-🆔 Référence dossier : **${dossier}**
-
-👤 Nom RP : ${nom}
-📞 Contact RP : ${contact}
-🎯 Type : ${type}
-
-📝 Détails :
-${details}
-
-⏳ Statut : EN ATTENTE DE VALIDATION`
-        })
-    }).then(() => {
-        window.location.href = "confirmation.html?ref=" + dossier;
-    });
+  fetch("https://blackveil-bot.onrender.com", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      nom,
+      contact,
+      type,
+      details
+    })
+  })
+  .then(() => {
+    window.location.href = "confirmation.html?ref=" + dossier;
+  })
+  .catch(err => console.error(err));
 });
 </script>
 
@@ -191,6 +186,7 @@ ${details}
 
 </body>
 </html>
+
 
 
 
