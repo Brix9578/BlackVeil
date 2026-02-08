@@ -45,8 +45,6 @@ client.login(process.env.DISCORD_TOKEN)
   .then(() => console.log("Login envoyé à Discord"))
   .catch(err => console.error("Erreur login Discord:", err));
 
-  });
-
 
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isButton()) return;
@@ -119,6 +117,7 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log("🌐 Serveur web actif sur le port " + PORT);
 });
+
 
 
 
