@@ -104,3 +104,11 @@ console.log("📡 Tentative de connexion à Discord...");
 client.login(process.env.DISCORD_TOKEN)
   .then(() => console.log("📡 Login envoyé à Discord"))
   .catch(err => console.error("❌ Erreur login Discord :", err));
+
+client.on("error", err => {
+  console.error("❌ Discord client error :", err);
+});
+
+client.on("shardError", err => {
+  console.error("❌ Shard error :", err);
+});
