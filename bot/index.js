@@ -10,7 +10,9 @@ const {
   EmbedBuilder
 } = require("discord.js");
 
-const app = express();
+app.use(cors({
+  origin: "https://brix9578.github.io"
+}));
 
 app.use(express.json());
 
@@ -100,6 +102,7 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log("🌐 Serveur web actif sur le port " + PORT);
 });
+
 
 
 
