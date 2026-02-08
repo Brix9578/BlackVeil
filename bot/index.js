@@ -12,16 +12,14 @@ const {
 console.log("🚀 index.js démarré");
 console.log("🔑 TOKEN PRESENT ?", !!process.env.DISCORD_TOKEN);
 
-// 🌐 MINI SERVEUR (réception contrat)
+// 🌐 MINI SERVEUR
 const app = express();
 app.use(express.json());
 
 // 🤖 CLIENT DISCORD
 const client = new Client({
   intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent
+    GatewayIntentBits.Guilds
   ]
 });
 
@@ -33,7 +31,7 @@ client.once("ready", () => {
 // 📩 RÉCEPTION CONTRAT DEPUIS LE SITE
 app.post("/contract", async (req, res) => {
   try {
-    const { joueur, mission, prix, channelId } = req.body;
+    const { joueur, mission, prix, detail, channelId } = req.body;
 
     const channel = await client.channels.fetch(channelId);
     if (!channel) return res.status(404).send("Salon introuvable");
@@ -41,10 +39,10 @@ app.post("/contract", async (req, res) => {
     const embed = new EmbedBuilder()
       .setTitle("📄 Nouvelle demande de contrat")
       .addFields(
-        { name: "👤 Joueur", value: joueur, inline: true },
-        { name: "🎯 Mission", value: mission, inline: true },
-        { name: "💰 Prix", value: prix, inline: true }
-        { name: "📄 Détail", value: Détail, inline: true }
+        { name: "👤 Joueur", value: joueur || "N/A", inline: true },
+        { name: "🎯 Mission", value: mission || "N/A", inline: true },
+        { name: "💰 Prix", value: prix || "N/A", inline: true },
+        { name: "📄 Détail", value: detail || "Aucun", inline: true }
       )
       .setColor(0x2b2d31)
       .setTimestamp();
@@ -91,10 +89,14 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
-// 🌐 LANCEMENT SERVEUR
+// 🌐 SERVEUR HTTP (OBLIGATOIRE POUR RENDER)
 const PORT = process.env.PORT || 10000;
+app.get("/", (req, res) => {
+  res.send("🤖 Bot Black Veil Agency en ligne");
+});
+
 app.listen(PORT, () => {
-  console.log("🌐 Endpoint contrat actif sur le port", PORT);
+  console.log("🌐 Serveur HTTP actif sur le port", PORT);
 });
 
 // 🔌 CONNEXION DISCORD
