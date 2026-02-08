@@ -123,6 +123,8 @@
 
 
 <script>
+/* ===== TERMINAL ===== */
+
 const text = `
 Connexion au serveur sécurisé...
 Authentification...
@@ -137,22 +139,25 @@ const speed = 35;
 const terminalText = document.getElementById("terminal-text");
 
 function typeWriter(){
-    if(i < text.length){
-        terminalText.innerHTML += text.charAt(i);
-        i++;
-        setTimeout(typeWriter, speed);
-    } else {
-        setTimeout(() => {
-            document.getElementById("terminal").style.display = "none";
-            document.body.classList.remove("loading");
-        }, 800);
-    }
+  if(i < text.length){
+    terminalText.innerHTML += text.charAt(i);
+    i++;
+    setTimeout(typeWriter, speed);
+  } else {
+    setTimeout(() => {
+      document.getElementById("terminal").style.display = "none";
+      document.body.classList.remove("loading");
+    }, 800);
+  }
 }
 
 typeWriter();
 </script>
 
-    document.getElementById("form").addEventListener("submit", function (e) {
+<script>
+/* ===== FORMULAIRE ===== */
+
+document.getElementById("form").addEventListener("submit", function (e) {
   e.preventDefault();
 
   const nom = document.getElementById("nom").value;
@@ -179,10 +184,12 @@ typeWriter();
   })
   .catch(err => console.error("❌ Erreur :", err));
 });
-
 </script>
+
+
 </body>
 </html>
+
 
 
 
