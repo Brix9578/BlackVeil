@@ -13,8 +13,12 @@ app.use(express.json());
 
 // ===== DISCORD BOT =====
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds]
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages
+  ]
 });
+
 
 client.once("ready", () => {
   console.log("🤖 Bot Discord connecté");
@@ -86,11 +90,14 @@ app.post("/new-contract", async (req, res) => {
     console.error("❌ Erreur envoi Discord :", err);
     res.status(500).json({ error: "Erreur Discord" });
   }
-const PORT = process.env.PORT || 10000;
+});
 
+// ✅ TOUJOURS À LA FIN
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log("🌐 Serveur web actif sur le port " + PORT);
 });
+
 
 
 
