@@ -43,12 +43,12 @@ app.post("/contract", async (req, res) => {
   cible_desc
 } = req.body;
 
+if (!demandeur_nom || !demandeur_tel || !type_contrat || !raison) {
+  return res.status(400).send("❌ Données demandeur manquantes");
+}
 
-    if (!joueur || !mission || !prix || !detail) {
-      return res.status(400).send("❌ Données manquantes");
-    }
-
-    const channel = await client.channels.fetch(CHANNEL_ID);
+  
+   const channel = await client.channels.fetch(CHANNEL_ID);
 
     if (!channel || !channel.isTextBased()) {
       return res.status(404).send("❌ Salon introuvable ou invalide");
