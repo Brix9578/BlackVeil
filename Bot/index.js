@@ -2,7 +2,7 @@ const { Client, GatewayIntentBits } = require("discord.js");
 const http = require("http");
 
 // ===== LOGS DE DÉMARRAGE =====
-console.log("🚀 Démarrage du bot BlackVail");
+console.log("🚀 Démarrage du bot BlackVeil");
 console.log("🔑 DISCORD_TOKEN présent ?", !!process.env.DISCORD_TOKEN);
 
 // ===== CLIENT DISCORD =====
@@ -38,7 +38,7 @@ const PORT = process.env.PORT || 3000;
 
 http.createServer((req, res) => {
   res.writeHead(200, { "Content-Type": "text/plain" });
-  res.end("Bot Discord BlackVail en ligne");
+  res.end("Bot Discord BlackVeil en ligne");
 }).listen(PORT, () => {
   console.log("🌍 Serveur HTTP actif sur le port", PORT);
 });
