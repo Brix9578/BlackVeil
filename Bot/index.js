@@ -1,3 +1,6 @@
+const CHANNEL_ID = "1469524090946846904";
+
+
 const express = require("express");
 const {
   Client,
@@ -50,7 +53,10 @@ if (!demandeur_nom || !demandeur_tel || !type_contrat || !raison) {
   return res.status(400).send("❌ Données demandeur manquantes");
 }
 
-  
+  if (!client.isReady()) {
+  return res.status(503).send("❌ Bot Discord pas encore prêt");
+}
+
    const channel = await client.channels.fetch(CHANNEL_ID);
 
     if (!channel || !channel.isTextBased()) {
