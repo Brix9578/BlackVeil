@@ -173,29 +173,28 @@ typeWriter();
 </script>
 
 <script>
-/* ===== FORMULAIRE ===== */
-
 document.getElementById("form").addEventListener("submit", function (e) {
   e.preventDefault();
 
-  const nom = document.getElementById("nom").value;
-  const contact = document.getElementById("contact").value;
-  const type = document.getElementById("type").value;
-  const details = document.getElementById("details").value;
+  const data = {
+    demandeur_nom: document.getElementById("demandeur_nom").value,
+    demandeur_contact: document.getElementById("demandeur_contact").value,
+    type_contrat: document.getElementById("type_contrat").value,
+    raison: document.getElementById("raison").value,
+
+    cible_nom: document.getElementById("cible_nom").value,
+    cible_contact: document.getElementById("cible_contact").value,
+    cible_apparence: document.getElementById("cible_apparence").value
+  };
 
   const dossier = Math.floor(Math.random() * 100000);
 
-  fetch("https://blackveil-bot.onrender.com/contract", {
+  fetch("https://TON-BOT.up.railway.app/contract", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({
-      nom,
-      contact,
-      type,
-      details
-    })
+    body: JSON.stringify(data)
   })
   .then(() => {
     window.location.href = "confirmation.html?ref=" + dossier;
@@ -207,6 +206,7 @@ document.getElementById("form").addEventListener("submit", function (e) {
 
 </body>
 </html>
+
 
 
 
