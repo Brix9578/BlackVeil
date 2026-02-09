@@ -1,7 +1,7 @@
 {
-  "name": "blackvail-discord-bot",
+  "name": "blackveil-discord-bot",
   "version": "1.0.0",
-  "description": "Bot Discord BlackVail hébergé sur Render",
+  "description": "Bot Discord BlackVeil hébergé sur Render",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
