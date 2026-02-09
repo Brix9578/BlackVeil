@@ -24,26 +24,18 @@
 <section>
     <h2>📡 Formulaire de commande RP</h2>
 
-    <form id="form">
+  <form id="form">
+
+  <h3>🧑‍💼 Demandeur</h3>
 
   <label>Nom RP</label>
-  <input
-    type="text"
-    id="nom"
-    placeholder="Nom RP"
-    required
-  >
+  <input type="text" id="demandeur_nom" placeholder="Nom RP du demandeur" required>
 
   <label>Moyen de contact RP</label>
-  <input
-    type="text"
-    id="contact"
-    placeholder="Téléphone / Message codé"
-    required
-  >
+  <input type="text" id="demandeur_contact" placeholder="Téléphone / Message codé" required>
 
   <label>Type de contrat</label>
-  <select id="type" required>
+  <select id="type_contrat" required>
     <option value="">— Choisir —</option>
     <option>Menaces / Peur</option>
     <option>Accident arrangé</option>
@@ -52,13 +44,21 @@
     <option>Double cible</option>
   </select>
 
-  <label>Détails RP</label>
-  <textarea
-    id="details"
-    rows="5"
-    placeholder="Informations RP uniquement"
-    required
-  ></textarea>
+  <label>Raison du contrat (RP)</label>
+  <textarea id="raison" rows="4" placeholder="Motif RP du contrat" required></textarea>
+
+  <hr>
+
+  <h3>🎯 Cible</h3>
+
+  <label>Nom RP de la cible (si connu)</label>
+  <input type="text" id="cible_nom" placeholder="Nom RP de la cible">
+
+  <label>Numéro RP de la cible</label>
+  <input type="text" id="cible_contact" placeholder="Téléphone RP de la cible">
+
+  <label>Tenue / apparence de la cible</label>
+  <textarea id="cible_apparence" rows="4" placeholder="Vêtements, couleur, signes distinctifs"></textarea>
 
   <button type="submit">📨 Envoyer la demande</button>
 
@@ -207,6 +207,7 @@ document.getElementById("form").addEventListener("submit", function (e) {
 
 </body>
 </html>
+
 
 
 
