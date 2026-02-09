@@ -17,7 +17,10 @@ app.use(express.json());
 
 // 🤖 Client Discord
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds]
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages
+  ]
 });
 
 // ✅ Bot prêt
