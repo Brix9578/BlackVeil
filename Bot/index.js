@@ -57,15 +57,30 @@ app.post("/contract", async (req, res) => {
     // embed + boutons (inchangé)
 
     const embed = new EmbedBuilder()
-      .setTitle("📄 Nouvelle demande de contrat")
-      .addFields(
-        { name: "👤 Joueur", value: joueur, inline: true },
-        { name: "🎯 Mission", value: mission, inline: true },
-        { name: "💰 Prix", value: prix, inline: true },
-        { name: "📄 Détail", value: detail, inline: false }
-      )
-      .setColor(0x2b2d31)
-      .setTimestamp();
+  .setTitle("📄 Nouvelle demande de contrat")
+  .setColor(0x2b2d31)
+  .addFields(
+    {
+      name: "🧑‍💼 Demandeur",
+      value:
+        `**Nom RP :** ${demandeur_nom}\n` +
+        `**Contact RP :** ${demandeur_tel}\n` +
+        `**Type :** ${type_contrat}`,
+    },
+    {
+      name: "📝 Raison",
+      value: raison
+    },
+    {
+      name: "🎯 Cible",
+      value:
+        `**Nom RP :** ${cible_nom || "Inconnu"}\n` +
+        `**Contact RP :** ${cible_tel || "Inconnu"}\n` +
+        `**Description :** ${cible_desc || "Aucune information"}`
+    }
+  )
+  .setTimestamp();
+
 
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
