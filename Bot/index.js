@@ -1,6 +1,5 @@
 const CHANNEL_ID = "1469524090946846904";
 
-
 const express = require("express");
 const {
   Client,
