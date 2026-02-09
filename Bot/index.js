@@ -33,7 +33,16 @@ app.post("/contract", async (req, res) => {
   try {
     console.log("📩 Données reçues :", req.body);
 
-    const { joueur, mission, prix, detail } = req.body;
+    const {
+  demandeur_nom,
+  demandeur_tel,
+  type_contrat,
+  raison,
+  cible_nom,
+  cible_tel,
+  cible_desc
+} = req.body;
+
 
     if (!joueur || !mission || !prix || !detail) {
       return res.status(400).send("❌ Données manquantes");
