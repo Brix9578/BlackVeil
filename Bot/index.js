@@ -31,8 +31,6 @@ client.once("ready", () => {
 });
 
 // 📩 Réception contrat
-// 🔒 SALON FIXE
-const CHANNEL_ID = "1469524090946846904";
 
 app.post("/contract", async (req, res) => {
   try {
