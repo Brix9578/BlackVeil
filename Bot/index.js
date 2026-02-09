@@ -1,5 +1,8 @@
 const CHANNEL_ID = "1469524090946846904";
 
+const express = require("express");
+const cors = require("cors");
+
 const {
   Client,
   GatewayIntentBits,
@@ -13,8 +16,6 @@ console.log("🚀 index.js démarré");
 console.log("🔑 TOKEN PRESENT ?", !!process.env.DISCORD_TOKEN);
 
 // 🌐 Serveur HTTP
-const express = require("express");
-const cors = require("cors");
 
 const app = express();
 
