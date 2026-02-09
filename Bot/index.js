@@ -8,69 +8,49 @@ const {
   EmbedBuilder
 } = require("discord.js");
 
-// =====================
-// CONFIG
-// =====================
-const PORT = process.env.PORT || 8080;
-const CHANNEL_ID = "1469524090946846904"; // 👈 OBLIGATOIRE
+console.log("🚀 index.js démarré");
+console.log("🔑 TOKEN PRESENT ?", !!process.env.DISCORD_TOKEN);
 
-// =====================
-// APP EXPRESS
-// =====================
+// 🌐 Serveur HTTP
 const app = express();
 app.use(express.json());
 
-// =====================
-// CLIENT DISCORD
-// =====================
+// 🤖 Client Discord
 const client = new Client({
   intents: [GatewayIntentBits.Guilds]
 });
 
-console.log("🚀 index.js démarré");
-console.log("🔑 TOKEN PRESENT ?", !!process.env.DISCORD_TOKEN);
-
-// =====================
-// BOT READY
-// =====================
+// ✅ Bot prêt
 client.once("ready", () => {
-  console.log(`🤖 Bot connecté : ${client.user.tag}`);
+  console.log("🤖 Bot connecté :", client.user.tag);
 });
 
-// =====================
-// RÉCEPTION CONTRAT
-// =====================
+// 📩 Réception contrat
 app.post("/contract", async (req, res) => {
   try {
-    const {
-      demandeur_nom,
-      demandeur_tel,
-      type_contrat,
-      raison,
-      cible_nom,
-      cible_tel,
-      cible_desc
-    } = req.body;
+    console.log("📩 Données reçues :", req.body);
 
-    const channel = await client.channels.fetch(CHANNEL_ID);
-    if (!channel) {
-      return res.status(404).send("Salon introuvable");
+    const { joueur, mission, prix, detail, channelId } = req.body;
+
+    if (!joueur || !mission || !prix || !detail || !channelId) {
+      return res.status(400).send("❌ Données manquantes");
+    }
+
+    const channel = await client.channels.fetch(1469524090946846904);
+
+    if (!channel || !channel.isTextBased()) {
+      return res.status(404).send("❌ Salon introuvable ou invalide");
     }
 
     const embed = new EmbedBuilder()
       .setTitle("📄 Nouvelle demande de contrat")
-      .setColor(0x2b2d31)
       .addFields(
-        { name: "👤 Demandeur", value: demandeur_nom || "N/A", inline: true },
-        { name: "📞 Téléphone", value: demandeur_tel || "N/A", inline: true },
-        { name: "🎯 Type", value: type_contrat || "N/A", inline: true },
-
-        { name: "📝 Raison", value: raison || "N/A" },
-
-        { name: "🎯 Cible", value: cible_nom || "Inconnue", inline: true },
-        { name: "📱 Tel cible", value: cible_tel || "N/A", inline: true },
-        { name: "👕 Description", value: cible_desc || "Aucune info" }
+        { name: "👤 Joueur", value: joueur, inline: true },
+        { name: "🎯 Mission", value: mission, inline: true },
+        { name: "💰 Prix", value: prix, inline: true },
+        { name: "📄 Détail", value: detail, inline: false }
       )
+      .setColor(0x2b2d31)
       .setTimestamp();
 
     const row = new ActionRowBuilder().addComponents(
@@ -78,7 +58,6 @@ app.post("/contract", async (req, res) => {
         .setCustomId("accept")
         .setLabel("Accepter")
         .setStyle(ButtonStyle.Success),
-
       new ButtonBuilder()
         .setCustomId("refuse")
         .setLabel("Refuser")
@@ -87,22 +66,20 @@ app.post("/contract", async (req, res) => {
 
     await channel.send({ embeds: [embed], components: [row] });
 
-    res.status(200).json({ success: true });
+    res.status(200).send("✅ Contrat envoyé sur Discord");
   } catch (err) {
     console.error("❌ Erreur contrat :", err);
-    res.status(500).json({ error: "Erreur serveur" });
+    res.status(500).send("Erreur serveur");
   }
 });
 
-// =====================
-// INTERACTIONS BOUTONS
-// =====================
-client.on("interactionCreate", async (interaction) => {
+// 🎯 Boutons
+client.on("interactionCreate", async interaction => {
   if (!interaction.isButton()) return;
 
   if (interaction.customId === "accept") {
     await interaction.update({
-      content: "✅ **Contrat ACCEPTÉ**",
+      content: "✅ Contrat ACCEPTÉ",
       embeds: [],
       components: []
     });
@@ -110,21 +87,19 @@ client.on("interactionCreate", async (interaction) => {
 
   if (interaction.customId === "refuse") {
     await interaction.update({
-      content: "❌ **Contrat REFUSÉ**",
+      content: "❌ Contrat REFUSÉ",
       embeds: [],
       components: []
     });
   }
 });
 
-// =====================
-// LANCEMENT
-// =====================
+// 🌐 Lancement serveur
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-  console.log(`🌐 Serveur actif sur le port ${PORT}`);
+  console.log("🌐 Serveur actif sur le port", PORT);
 });
 
-client.login(process.env.DISCORD_TOKEN)
-  .then(() => console.log("📡 Connexion Discord envoyée"))
-  .catch(err => console.error("❌ Erreur login Discord :", err));
-
+// 🔌 Connexion Discord
+console.log("📡 Connexion Discord...");
+client.login(process.env.DISCORD_TOKEN);
