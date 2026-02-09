@@ -1,5 +1,7 @@
+// ================== CONFIG ==================
 const CHANNEL_ID = "1469524090946846904";
 
+// ================== IMPORTS =================
 const express = require("express");
 const cors = require("cors");
 
@@ -12,27 +14,24 @@ const {
   EmbedBuilder
 } = require("discord.js");
 
+// ================== LOGS ====================
 console.log("🚀 index.js démarré");
 console.log("🔑 TOKEN PRESENT ?", !!process.env.DISCORD_TOKEN);
 
-// 🌐 Serveur HTTP
-
+// ================== SERVEUR HTTP ============
 const app = express();
 
-// ✅ CORS COMPLET (OBLIGATOIRE)
+// ✅ CORS (OBLIGATOIRE AVANT LES ROUTES)
 app.use(cors({
   origin: "*",
   methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type"],
+  allowedHeaders: ["Content-Type"]
 }));
 
-// ✅ Répond explicitement aux preflight
 app.options("*", cors());
-
 app.use(express.json());
 
-
-// 🤖 Client Discord
+// ================== DISCORD CLIENT ==========
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -45,7 +44,7 @@ client.once("ready", () => {
   console.log("🤖 Bot connecté :", client.user.tag);
 });
 
-// 📩 Réception contrat
+// ================== ROUTE CONTRACT ==========
 app.post("/contract", async (req, res) => {
   try {
     console.log("📩 Données reçues :", req.body);
@@ -60,9 +59,9 @@ app.post("/contract", async (req, res) => {
       cible_desc
     } = req.body;
 
-    // ✅ Vérification logique
+    // 🔎 Vérification minimale
     if (!demandeur_nom || !demandeur_tel || !type_contrat || !raison) {
-      return res.status(400).json({ error: "Données demandeur manquantes" });
+      return res.status(400).json({ error: "Champs demandeur manquants" });
     }
 
     if (!client.isReady()) {
@@ -72,9 +71,10 @@ app.post("/contract", async (req, res) => {
     const channel = await client.channels.fetch(CHANNEL_ID);
 
     if (!channel || !channel.isTextBased()) {
-      return res.status(404).json({ error: "Salon introuvable" });
+      return res.status(404).json({ error: "Salon Discord introuvable" });
     }
 
+    // 📦 Embed Discord
     const embed = new EmbedBuilder()
       .setTitle("📄 Nouvelle demande de contrat")
       .setColor(0x2b2d31)
@@ -84,7 +84,7 @@ app.post("/contract", async (req, res) => {
           value:
             `**Nom RP :** ${demandeur_nom}\n` +
             `**Contact RP :** ${demandeur_tel}\n` +
-            `**Type :** ${type_contrat}`,
+            `**Type :** ${type_contrat}`
         },
         {
           name: "📝 Raison",
@@ -100,6 +100,7 @@ app.post("/contract", async (req, res) => {
       )
       .setTimestamp();
 
+    // 🎯 Boutons
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId("accept")
@@ -113,14 +114,14 @@ app.post("/contract", async (req, res) => {
 
     await channel.send({ embeds: [embed], components: [row] });
 
-    res.json({ success: true });
+    return res.json({ success: true });
   } catch (err) {
-    console.error("❌ Erreur contrat :", err);
-    res.status(500).json({ error: "Erreur serveur" });
+    console.error("❌ Erreur /contract :", err);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 });
 
-// 🎯 Boutons Discord
+// ================== INTERACTIONS ============
 client.on("interactionCreate", async interaction => {
   if (!interaction.isButton()) return;
 
@@ -141,12 +142,13 @@ client.on("interactionCreate", async interaction => {
   }
 });
 
-// 🌐 Lancement serveur
+// ================== START SERVEUR ===========
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log("🌐 Serveur actif sur le port", PORT);
 });
 
-// 🔌 Connexion Discord
-console.log("📡 Connexion Discord...");
+// ================== LOGIN DISCORD ===========
+console.log("📡 Connexion à Discord...");
 client.login(process.env.DISCORD_TOKEN);
+
