@@ -12,7 +12,7 @@ const {
 // CONFIG
 // =====================
 const PORT = process.env.PORT || 8080;
-const CHANNEL_ID = "MET_ICI_L_ID_DU_SALON"; // 👈 OBLIGATOIRE
+const CHANNEL_ID = "1469524090946846904"; // 👈 OBLIGATOIRE
 
 // =====================
 // APP EXPRESS
