@@ -26,21 +26,26 @@ client.once("ready", () => {
 });
 
 // 📩 Réception contrat
+// 🔒 SALON FIXE
+const CHANNEL_ID = "1469524090946846904";
+
 app.post("/contract", async (req, res) => {
   try {
     console.log("📩 Données reçues :", req.body);
 
-    const { joueur, mission, prix, detail, channelId } = req.body;
+    const { joueur, mission, prix, detail } = req.body;
 
-    if (!joueur || !mission || !prix || !detail || !channelId) {
+    if (!joueur || !mission || !prix || !detail) {
       return res.status(400).send("❌ Données manquantes");
     }
 
-    const channel = await client.channels.fetch(1469524090946846904);
+    const channel = await client.channels.fetch(CHANNEL_ID);
 
     if (!channel || !channel.isTextBased()) {
       return res.status(404).send("❌ Salon introuvable ou invalide");
     }
+
+    // embed + boutons (inchangé)
 
     const embed = new EmbedBuilder()
       .setTitle("📄 Nouvelle demande de contrat")
