@@ -21,3 +21,14 @@ console.log("📡 Tentative de connexion à Discord...");
 client.login(process.env.DISCORD_TOKEN)
   .then(() => console.log("📡 Login envoyé à Discord"))
   .catch(err => console.error("❌ Erreur login Discord :", err));
+
+const http = require("http");
+
+const PORT = process.env.PORT || 3000;
+
+http.createServer((req, res) => {
+  res.writeHead(200, { "Content-Type": "text/plain" });
+  res.end("Bot Discord BlackVail en ligne");
+}).listen(PORT, () => {
+  console.log("🌍 Serveur HTTP actif sur le port", PORT);
+});
