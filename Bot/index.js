@@ -1,6 +1,7 @@
 const CHANNEL_ID = "1469524090946846904";
 
 const express = require("express");
+const cors = require("cors");
 const {
   Client,
   GatewayIntentBits,
@@ -15,6 +16,13 @@ console.log("🔑 TOKEN PRESENT ?", !!process.env.DISCORD_TOKEN);
 
 // 🌐 Serveur HTTP
 const app = express();
+
+// ✅ CORS (autorise GitHub Pages)
+app.use(cors({
+  origin: "*",
+  methods: ["POST"],
+}));
+
 app.use(express.json());
 
 // 🤖 Client Discord
@@ -31,62 +39,59 @@ client.once("ready", () => {
 });
 
 // 📩 Réception contrat
-
 app.post("/contract", async (req, res) => {
   try {
     console.log("📩 Données reçues :", req.body);
 
     const {
-  demandeur_nom,
-  demandeur_tel,
-  type_contrat,
-  raison,
-  cible_nom,
-  cible_tel,
-  cible_desc
-} = req.body;
+      demandeur_nom,
+      demandeur_tel,
+      type_contrat,
+      raison,
+      cible_nom,
+      cible_tel,
+      cible_desc
+    } = req.body;
 
-if (!demandeur_nom || !demandeur_tel || !type_contrat || !raison) {
-  return res.status(400).send("❌ Données demandeur manquantes");
-}
+    // ✅ Vérification logique
+    if (!demandeur_nom || !demandeur_tel || !type_contrat || !raison) {
+      return res.status(400).json({ error: "Données demandeur manquantes" });
+    }
 
-  if (!client.isReady()) {
-  return res.status(503).send("❌ Bot Discord pas encore prêt");
-}
+    if (!client.isReady()) {
+      return res.status(503).json({ error: "Bot Discord pas prêt" });
+    }
 
-   const channel = await client.channels.fetch(CHANNEL_ID);
+    const channel = await client.channels.fetch(CHANNEL_ID);
 
     if (!channel || !channel.isTextBased()) {
-      return res.status(404).send("❌ Salon introuvable ou invalide");
+      return res.status(404).json({ error: "Salon introuvable" });
     }
-
-    // embed + boutons (inchangé)
 
     const embed = new EmbedBuilder()
-  .setTitle("📄 Nouvelle demande de contrat")
-  .setColor(0x2b2d31)
-  .addFields(
-    {
-      name: "🧑‍💼 Demandeur",
-      value:
-        `**Nom RP :** ${demandeur_nom}\n` +
-        `**Contact RP :** ${demandeur_tel}\n` +
-        `**Type :** ${type_contrat}`,
-    },
-    {
-      name: "📝 Raison",
-      value: raison
-    },
-    {
-      name: "🎯 Cible",
-      value:
-        `**Nom RP :** ${cible_nom || "Inconnu"}\n` +
-        `**Contact RP :** ${cible_tel || "Inconnu"}\n` +
-        `**Description :** ${cible_desc || "Aucune information"}`
-    }
-  )
-  .setTimestamp();
-
+      .setTitle("📄 Nouvelle demande de contrat")
+      .setColor(0x2b2d31)
+      .addFields(
+        {
+          name: "🧑‍💼 Demandeur",
+          value:
+            `**Nom RP :** ${demandeur_nom}\n` +
+            `**Contact RP :** ${demandeur_tel}\n` +
+            `**Type :** ${type_contrat}`,
+        },
+        {
+          name: "📝 Raison",
+          value: raison
+        },
+        {
+          name: "🎯 Cible",
+          value:
+            `**Nom RP :** ${cible_nom || "Inconnu"}\n` +
+            `**Contact RP :** ${cible_tel || "Inconnu"}\n` +
+            `**Description :** ${cible_desc || "Aucune information"}`
+        }
+      )
+      .setTimestamp();
 
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
@@ -101,14 +106,14 @@ if (!demandeur_nom || !demandeur_tel || !type_contrat || !raison) {
 
     await channel.send({ embeds: [embed], components: [row] });
 
-    res.status(200).send("✅ Contrat envoyé sur Discord");
+    res.json({ success: true });
   } catch (err) {
     console.error("❌ Erreur contrat :", err);
-    res.status(500).send("Erreur serveur");
+    res.status(500).json({ error: "Erreur serveur" });
   }
 });
 
-// 🎯 Boutons
+// 🎯 Boutons Discord
 client.on("interactionCreate", async interaction => {
   if (!interaction.isButton()) return;
 
