@@ -1,7 +1,5 @@
 const CHANNEL_ID = "1469524090946846904";
 
-const express = require("express");
-const cors = require("cors");
 const {
   Client,
   GatewayIntentBits,
@@ -15,15 +13,23 @@ console.log("🚀 index.js démarré");
 console.log("🔑 TOKEN PRESENT ?", !!process.env.DISCORD_TOKEN);
 
 // 🌐 Serveur HTTP
+const express = require("express");
+const cors = require("cors");
+
 const app = express();
 
-// ✅ CORS (autorise GitHub Pages)
+// ✅ CORS COMPLET (OBLIGATOIRE)
 app.use(cors({
   origin: "*",
-  methods: ["POST"],
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type"],
 }));
 
+// ✅ Répond explicitement aux preflight
+app.options("*", cors());
+
 app.use(express.json());
+
 
 // 🤖 Client Discord
 const client = new Client({
