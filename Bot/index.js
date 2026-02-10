@@ -5,17 +5,8 @@ const ARCHIVE_CHANNEL_ID = "1470904139008446485";
 // ================== IMPORTS =================
 const express = require("express");
 const fs = require("fs");
+const path = require("path");
 const app = express();
-
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "https://brix9578.github.io");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  if (req.method === "OPTIONS") return res.sendStatus(200);
-  next();
-});
-
-app.use(express.json());
 
 const {
   Client,
@@ -26,6 +17,17 @@ const {
   EmbedBuilder
 } = require("discord.js");
 
+// ================== EXPRESS =================
+app.use(express.json());
+
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  if (req.method === "OPTIONS") return res.sendStatus(200);
+  next();
+});
+
 // ================== DISCORD CLIENT ==========
 const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages]
@@ -35,20 +37,26 @@ client.once("ready", () => {
   console.log("🤖 Bot connecté :", client.user.tag);
 });
 
-// ================== UTILS ==================
+// ================== DOSSIERS =================
+const DOSSIER_PATH = path.join(__dirname, "dossiers.json");
+
 function loadDossiers() {
-  return JSON.parse(fs.readFileSync("dossiers.json", "utf8"));
-}
-function saveDossiers(data) {
-  fs.writeFileSync("dossiers.json", JSON.stringify(data, null, 2));
+  if (!fs.existsSync(DOSSIER_PATH)) {
+    fs.writeFileSync(DOSSIER_PATH, "{}");
+  }
+  return JSON.parse(fs.readFileSync(DOSSIER_PATH, "utf8"));
 }
 
-// ================== ROUTE CONTRACT ==========
+function saveDossiers(data) {
+  fs.writeFileSync(DOSSIER_PATH, JSON.stringify(data, null, 2));
+}
+
+// ================== ROUTE ENVOI DOSSIER =====
 app.post("/contract", async (req, res) => {
   try {
     const year = new Date().getFullYear();
     const random = Math.floor(10000 + Math.random() * 90000);
-    const dossier = `BV-${year}-${random}`;
+    const dossierId = `BV-${year}-${random}`;
 
     const {
       demandeur_nom,
@@ -65,10 +73,12 @@ app.post("/contract", async (req, res) => {
     }
 
     const dossiers = loadDossiers();
-    dossiers[dossier] = {
+    dossiers[dossierId] = {
       statut: "en_attente",
       demandeur_nom,
+      demandeur_tel,
       type_contrat,
+      raison,
       date: new Date().toISOString()
     };
     saveDossiers(dossiers);
@@ -80,7 +90,7 @@ app.post("/contract", async (req, res) => {
       .setColor(0x2b2d31)
       .setDescription(
 `📁 **Dossier**
-**${dossier}**
+**${dossierId}**
 
 🧑 **Demandeur**
 ${demandeur_nom} — ${demandeur_tel}
@@ -98,62 +108,89 @@ ${raison}`
       .setTimestamp();
 
     const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder().setCustomId("accept").setLabel("Accepter").setStyle(ButtonStyle.Success),
-      new ButtonBuilder().setCustomId("refuse").setLabel("Refuser").setStyle(ButtonStyle.Danger)
+      new ButtonBuilder()
+        .setCustomId(`accept_${dossierId}`)
+        .setLabel("Accepter")
+        .setStyle(ButtonStyle.Success),
+      new ButtonBuilder()
+        .setCustomId(`refuse_${dossierId}`)
+        .setLabel("Refuser")
+        .setStyle(ButtonStyle.Danger)
     );
 
     await channel.send({ embeds: [embed], components: [row] });
 
-    res.json({ success: true, dossier });
+    res.json({ success: true, dossier: dossierId });
 
-  } catch (e) {
-    console.error(e);
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Erreur serveur" });
   }
 });
 
-// ================== SUIVI DOSSIER ==========
-app.get("/suivi/:id", (req, res) => {
-  const dossiers = loadDossiers();
-  const dossier = dossiers[req.params.id];
+// ================== ROUTE SUIVI DOSSIER ======
+app.get("/suivi", (req, res) => {
+  const { ref } = req.query;
 
-  if (!dossier) return res.status(404).json({ error: "Introuvable" });
-  res.json(dossier);
+  if (!ref) {
+    return res.json({ success: false, message: "Numéro manquant" });
+  }
+
+  const dossiers = loadDossiers();
+  const dossier = dossiers[ref];
+
+  if (!dossier) {
+    return res.json({ success: false, message: "Dossier introuvable" });
+  }
+
+  let status = "🟡 EN ATTENTE";
+  if (dossier.statut === "accepte") status = "🟢 ACCEPTE";
+  if (dossier.statut === "refuse") status = "🔴 REFUSE";
+
+  res.json({
+    success: true,
+    ref,
+    status
+  });
 });
 
-// ================== INTERACTIONS ============
+// ================== INTERACTIONS DISCORD =====
 client.on("interactionCreate", async interaction => {
   if (!interaction.isButton()) return;
-  if (!["accept", "refuse"].includes(interaction.customId)) return;
 
-  const accepted = interaction.customId === "accept";
+  const [action, dossierId] = interaction.customId.split("_");
+  if (!["accept", "refuse"].includes(action)) return;
+
   const dossiers = loadDossiers();
+  if (!dossiers[dossierId]) return;
 
-  const dossierId = interaction.message.embeds[0]
-    .description.match(/BV-\d{4}-\d{5}/)[0];
-
-  dossiers[dossierId].statut = accepted ? "accepte" : "refuse";
+  dossiers[dossierId].statut = action === "accept" ? "accepte" : "refuse";
   saveDossiers(dossiers);
 
   const archiveChannel = interaction.guild.channels.cache.get(ARCHIVE_CHANNEL_ID);
   await archiveChannel.send({
-    content: `📁 **Dossier ${accepted ? "ACCEPTÉ" : "REFUSÉ"}**`,
+    content: `📁 **Dossier ${action === "accept" ? "ACCEPTÉ" : "REFUSÉ"}**`,
     embeds: interaction.message.embeds
   });
 
   const row = new ActionRowBuilder().addComponents(
-    new ButtonBuilder().setCustomId("accept_disabled").setLabel("Accepté").setStyle(ButtonStyle.Success).setDisabled(true),
-    new ButtonBuilder().setCustomId("refuse_disabled").setLabel("Refusé").setStyle(ButtonStyle.Danger).setDisabled(true)
+    new ButtonBuilder()
+      .setLabel("Accepté")
+      .setStyle(ButtonStyle.Success)
+      .setDisabled(true),
+    new ButtonBuilder()
+      .setLabel("Refusé")
+      .setStyle(ButtonStyle.Danger)
+      .setDisabled(true)
   );
 
   await interaction.update({
-    content: `📌 Dossier ${accepted ? "accepté" : "refusé"}`,
+    content: `📌 Dossier ${action === "accept" ? "accepté" : "refusé"}`,
     components: [row]
   });
 });
 
 // ================== START ===================
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log("🌐 Serveur actif", PORT));
+app.listen(PORT, () => console.log("🌐 Serveur actif sur le port", PORT));
 client.login(process.env.DISCORD_TOKEN);
-
