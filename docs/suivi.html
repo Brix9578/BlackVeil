@@ -72,7 +72,10 @@ async function checkDossier() {
     result.innerHTML = "⏳ Vérification en cours...";
 
     try {
-        const response = await fetch(`/suivi?ref=${encodeURIComponent(ref)}&name=${encodeURIComponent(name)}`);
+        const response = await fetch(
+          `https://blackveil-1.onrender.com/suivi?ref=${encodeURIComponent(ref)}&name=${encodeURIComponent(name)}`
+        );
+
         const data = await response.json();
 
         if (!data.success) {
@@ -81,8 +84,8 @@ async function checkDossier() {
         }
 
         let color = "#ffaa00";
-        if (data.status === "ACCEPTE") color = "#00ff66";
-        if (data.status === "REFUSE") color = "#ff4444";
+        if (data.status.includes("ACCEPTE")) color = "#00ff66";
+        if (data.status.includes("REFUSE")) color = "#ff4444";
 
         result.innerHTML = `
             <p>Dossier : <strong>${data.ref}</strong></p>
@@ -98,6 +101,3 @@ async function checkDossier() {
 
 </body>
 </html>
-
-
-
