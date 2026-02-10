@@ -11,9 +11,7 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
+  if (req.method === "OPTIONS") return res.sendStatus(200);
   next();
 });
 
@@ -93,6 +91,7 @@ ${raison}`
         .setCustomId("accept")
         .setLabel("Accepter")
         .setStyle(ButtonStyle.Success),
+
       new ButtonBuilder()
         .setCustomId("refuse")
         .setLabel("Refuser")
@@ -100,10 +99,11 @@ ${raison}`
     );
 
     await channel.send({ embeds: [embed], components: [row] });
+
     return res.json({ success: true, dossier });
 
   } catch (err) {
-    console.error(err);
+    console.error("❌ Erreur /contract :", err);
     return res.status(500).json({ error: "Erreur serveur" });
   }
 });
@@ -111,35 +111,61 @@ ${raison}`
 // ================== INTERACTIONS ============
 client.on("interactionCreate", async interaction => {
   if (!interaction.isButton()) return;
+
+  // Bloque les anciens boutons désactivés
+  if (interaction.customId.endsWith("_disabled")) {
+    return interaction.reply({
+      content: "⛔ Ce dossier est déjà traité.",
+      ephemeral: true
+    });
+  }
+
   if (!["accept", "refuse"].includes(interaction.customId)) return;
 
-  const archiveChannel = interaction.guild.channels.cache.get(ARCHIVE_CHANNEL_ID);
-  const accepted = interaction.customId === "accept";
+  try {
+    const archiveChannel = interaction.guild.channels.cache.get(ARCHIVE_CHANNEL_ID);
+    if (!archiveChannel) throw new Error("Salon archive introuvable");
 
-  // 📦 Envoi dans les archives
-  await archiveChannel.send({
-    content: `📁 **Dossier ${accepted ? "ACCEPTÉ ✅" : "REFUSÉ ❌"}**
+    const accepted = interaction.customId === "accept";
+
+    // 📦 ARCHIVE
+    await archiveChannel.send({
+      content: `📁 **Dossier ${accepted ? "ACCEPTÉ ✅" : "REFUSÉ ❌"}**
 👮 Staff : ${interaction.user}`,
-    embeds: interaction.message.embeds
-  });
+      embeds: interaction.message.embeds
+    });
 
-  // 🔒 Désactiver les boutons
-  const disabledRow = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setLabel("Accepté ✅")
-      .setStyle(ButtonStyle.Success)
-      .setDisabled(true),
-    new ButtonBuilder()
-      .setLabel("Refusé ❌")
-      .setStyle(ButtonStyle.Danger)
-      .setDisabled(true)
-  );
+    // 🔒 Boutons désactivés (FIX BUG INTERACTION)
+    const disabledRow = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId("accept_disabled")
+        .setLabel("Accepté ✅")
+        .setStyle(ButtonStyle.Success)
+        .setDisabled(true),
 
-  // 🧾 Modifier le message original (sans supprimer)
-  await interaction.update({
-    content: `📌 **Dossier ${accepted ? "accepté" : "refusé"}**`,
-    components: [disabledRow]
-  });
+      new ButtonBuilder()
+        .setCustomId("refuse_disabled")
+        .setLabel("Refusé ❌")
+        .setStyle(ButtonStyle.Danger)
+        .setDisabled(true)
+    );
+
+    // 🧾 Update message original
+    await interaction.update({
+      content: `📌 **Dossier ${accepted ? "accepté" : "refusé"}**`,
+      components: [disabledRow]
+    });
+
+  } catch (error) {
+    console.error("❌ Erreur interaction :", error);
+
+    if (!interaction.replied) {
+      await interaction.reply({
+        content: "❌ Une erreur est survenue.",
+        ephemeral: true
+      });
+    }
+  }
 });
 
 // ================== START ===================
