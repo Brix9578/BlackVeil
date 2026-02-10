@@ -70,19 +70,31 @@ app.post("/contract", async (req, res) => {
       return res.status(404).json({ error: "Salon Discord introuvable" });
     }
 
-    const embed = new EmbedBuilder()
-      .setTitle("📄 Nouvelle demande de contrat")
-      .setColor(0x2b2d31)
-      .addFields(
-        { name: "📁 Dossier", value: `**${dossier}**` },
-        { name: "🧑 Demandeur", value: `${demandeur_nom} (${demandeur_tel})` },
-        { name: "🎯 Cible", value: `${cible_nom || "Inconnu"} (${cible_tel || "N/A"})` },
-        { name: "📜 Contrat", value: type_contrat },
-        { name: "🧠 Motif", value: raison },
-        { name: "📝 Description", value: cible_desc || "Aucune info" }
-      )
-      .setTimestamp();
+   const embed = new EmbedBuilder()
+.setTitle("📄 Nouvelle demande de contrat")
+.setColor(0x2b2d31)
+.setDescription(
+`📁 **Dossier**
+**${dossier}**
 
+🧑 **Demandeur**
+**Nom RP :** ${demandeur_nom}
+**Contact RP :** ${demandeur_tel}
+
+🎯 **Cible**
+**Nom RP :** ${cible_nom || "Inconnu"}
+**Contact RP :** ${cible_tel || "Inconnu"}
+**Description :** ${cible_desc || "Aucune information"}
+
+📜 **Contrat**
+**Type :** ${type_contrat}
+
+🧠 **Motif**
+${raison}`
+)
+.setTimestamp();
+
+    
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId("accept")
