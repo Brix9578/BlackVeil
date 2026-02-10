@@ -173,47 +173,59 @@ typeWriter();
 </script>
 
 <script>
-document.getElementById("form").addEventListener("submit", function (e) {
-  e.preventDefault();
+document.addEventListener("DOMContentLoaded", () => {
 
-  const data = {
-  demandeur_nom: document.getElementById("demandeur_nom").value,
-  demandeur_tel: document.getElementById("demandeur_contact").value,
-  type_contrat: document.getElementById("type_contrat").value,
-  raison: document.getElementById("raison").value,
-
-  cible_nom: document.getElementById("cible_nom").value,
-  cible_tel: document.getElementById("cible_contact").value,
-  cible_desc: document.getElementById("cible_apparence").value
-};
-
-
- fetch("https://blackveil-production-4558.up.railway.app/contract", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify(data)
-})
-.then(res => res.json()) // 👈 on récupère la réponse serveur
-.then(result => {
-  if (!result.success) {
-    throw new Error("Échec création dossier");
+  const form = document.getElementById("form");
+  if (!form) {
+    console.error("❌ Formulaire introuvable");
+    return;
   }
 
-  // 🗂️ Dossier RP généré par le serveur
-  const dossier = result.dossier;
+  form.addEventListener("submit", function (e) {
+    e.preventDefault(); // 🚫 empêche le reload
 
-  // ➡️ Redirection avec le vrai numéro
-  window.location.href = "confirmation.html?ref=" + dossier;
-})
-.catch(err => console.error("❌ Erreur :", err));
+    const data = {
+      demandeur_nom: document.getElementById("demandeur_nom").value,
+      demandeur_tel: document.getElementById("demandeur_contact").value,
+      type_contrat: document.getElementById("type_contrat").value,
+      raison: document.getElementById("raison").value,
 
+      cible_nom: document.getElementById("cible_nom").value,
+      cible_tel: document.getElementById("cible_contact").value,
+      cible_desc: document.getElementById("cible_apparence").value
+    };
+
+    fetch("https://blackveil-production-4558.up.railway.app/contract", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(result => {
+      if (!result.success) {
+        throw new Error("Échec création dossier");
+      }
+
+      const dossier = result.dossier;
+
+      window.location.href = "confirmation.html?ref=" + dossier;
+    })
+    .catch(err => {
+      console.error("❌ Erreur :", err);
+      alert("Erreur lors de l'envoi du dossier");
+    });
+  });
+
+});
 </script>
+
 
 
 </body>
 </html>
+
 
 
 
