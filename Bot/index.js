@@ -120,14 +120,20 @@ app.post("/contract", async (req, res) => {
         .setStyle(ButtonStyle.Danger)
     );
 
-    await channel.send({ embeds: [embed], components: [row] });
+ try {
+  // ... ton code
+  await channel.send({ embeds: [embed], components: [row] });
 
-    return res.json({ success: true });
-  } catch (err) {
-    console.error("❌ Erreur /contract :", err);
-    return res.status(500).json({ error: "Erreur serveur" });
-  }
-});
+  return res.json({
+    success: true,
+    dossier: dossier
+  });
+
+} catch (err) {
+  console.error("❌ Erreur /contract :", err);
+  return res.status(500).json({ error: "Erreur serveur" });
+}
+
 
 // ================== INTERACTIONS ============
 client.on("interactionCreate", async interaction => {
