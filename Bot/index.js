@@ -49,10 +49,16 @@ client.once("ready", () => {
 
 // ================== ROUTE CONTRACT ==========
 app.post("/contract", async (req, res) => {
-  console.log("📥 /contract HIT");
+  console.log("📩 /contract HIT");
   console.log("📦 BODY:", req.body);
 
   try {
+
+    // 🕶️ Génération dossier Black Veil
+    const year = new Date().getFullYear();
+    const random = Math.floor(10000 + Math.random() * 90000);
+    const dossier = `BV-${year}-${random}`;
+
     const {
       demandeur_nom,
       demandeur_tel,
