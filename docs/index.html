@@ -187,25 +187,34 @@ document.getElementById("form").addEventListener("submit", function (e) {
   cible_desc: document.getElementById("cible_apparence").value
 };
 
-  const dossier = Math.floor(Math.random() * 100000);
 
-  fetch("https://blackveil-production-4558.up.railway.app/contract", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(data)
-  })
-  .then(() => {
-    window.location.href = "confirmation.html?ref=" + dossier;
-  })
-  .catch(err => console.error("❌ Erreur :", err));
-});
+ fetch("https://blackveil-production-4558.up.railway.app/contract", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify(data)
+})
+.then(res => res.json()) // 👈 on récupère la réponse serveur
+.then(result => {
+  if (!result.success) {
+    throw new Error("Échec création dossier");
+  }
+
+  // 🗂️ Dossier RP généré par le serveur
+  const dossier = result.dossier;
+
+  // ➡️ Redirection avec le vrai numéro
+  window.location.href = "confirmation.html?ref=" + dossier;
+})
+.catch(err => console.error("❌ Erreur :", err));
+
 </script>
 
 
 </body>
 </html>
+
 
 
 
