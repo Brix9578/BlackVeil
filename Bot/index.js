@@ -123,7 +123,7 @@ ${raison}`
     res.json({ success: true, dossier: dossierId });
 
   } catch (err) {
-    console.error(err);
+    console.error("Erreur /contract :", err);
     res.status(500).json({ error: "Erreur serveur" });
   }
 });
@@ -158,6 +158,9 @@ app.get("/suivi", (req, res) => {
 client.on("interactionCreate", async interaction => {
   if (!interaction.isButton()) return;
 
+  // ✅ RÉPONSE IMMÉDIATE À DISCORD (FINI LES ERREURS)
+  await interaction.deferUpdate();
+
   const [action, dossierId] = interaction.customId.split("_");
   if (!["accept", "refuse"].includes(action)) return;
 
@@ -168,10 +171,12 @@ client.on("interactionCreate", async interaction => {
   saveDossiers(dossiers);
 
   const archiveChannel = interaction.guild.channels.cache.get(ARCHIVE_CHANNEL_ID);
-  await archiveChannel.send({
-    content: `📁 **Dossier ${action === "accept" ? "ACCEPTÉ" : "REFUSÉ"}**`,
-    embeds: interaction.message.embeds
-  });
+  if (archiveChannel) {
+    await archiveChannel.send({
+      content: `📁 **Dossier ${action === "accept" ? "ACCEPTÉ" : "REFUSÉ"}**`,
+      embeds: interaction.message.embeds
+    });
+  }
 
   const row = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
@@ -184,7 +189,7 @@ client.on("interactionCreate", async interaction => {
       .setDisabled(true)
   );
 
-  await interaction.update({
+  await interaction.editReply({
     content: `📌 Dossier ${action === "accept" ? "accepté" : "refusé"}`,
     components: [row]
   });
@@ -193,4 +198,5 @@ client.on("interactionCreate", async interaction => {
 // ================== START ===================
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log("🌐 Serveur actif sur le port", PORT));
+
 client.login(process.env.DISCORD_TOKEN);
