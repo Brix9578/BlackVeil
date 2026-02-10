@@ -85,7 +85,6 @@ app.post("/contract", async (req, res) => {
       return res.status(404).json({ error: "Salon Discord introuvable" });
     }
 
-    const dossier = `BV-${Math.floor(100000 + Math.random() * 900000)}`;
     
     // 📦 Embed Discord
   const embed = new EmbedBuilder()
