@@ -133,6 +133,7 @@ app.post("/contract", async (req, res) => {
   return res.status(500).json({ error: "Erreur serveur" });
 }
 
+});
 
 // ================== INTERACTIONS ============
 client.on("interactionCreate", async interaction => {
