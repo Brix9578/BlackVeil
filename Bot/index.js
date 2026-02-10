@@ -49,26 +49,29 @@ client.once("ready", () => {
 
 // ================== ROUTE CONTRACT ==========
 app.post("/contract", async (req, res) => {
+  console.log("📥 /contract HIT");
+  console.log("📦 BODY:", req.body);
+
   try {
-    console.log("📩 Données reçues :", req.body);
-
     const {
-  demandeur_nom,
-  demandeur_contact,
-  type_contrat,
-  raison,
-  cible_nom,
-  cible_contact,
-  cible_apparence
-} = req.body;
+      demandeur_nom,
+      demandeur_tel,
+      type_contrat,
+      raison,
+      cible_nom,
+      cible_tel,
+      cible_desc
+    } = req.body;
 
-  if (!demandeur_nom || !demandeur_contact || !type_contrat || !raison) {
-  return res.status(400).json({ error: "Champs demandeur manquants" });
-}
+    if (!demandeur_nom || !demandeur_tel || !type_contrat || !raison) {
+      return res.status(400).json({ error: "Champs demandeur manquants" });
+    }
 
     if (!client.isReady()) {
       return res.status(503).json({ error: "Bot Discord pas prêt" });
     }
+
+    // suite du code…
 
     const channel = await client.channels.fetch(CHANNEL_ID);
 
