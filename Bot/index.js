@@ -1,5 +1,6 @@
 // ================== CONFIG ==================
 const CHANNEL_ID = "1469524090946846904";
+const ARCHIVE_CHANNEL_ID = "1470904139008446485";
 
 // ================== IMPORTS =================
 const express = require("express");
@@ -38,11 +39,7 @@ client.once("ready", () => {
 
 // ================== ROUTE CONTRACT ==========
 app.post("/contract", async (req, res) => {
-  console.log("📩 /contract HIT");
-  console.log("📦 BODY:", req.body);
-
   try {
-    // 🕶️ Génération dossier
     const year = new Date().getFullYear();
     const random = Math.floor(10000 + Math.random() * 90000);
     const dossier = `BV-${year}-${random}`;
@@ -66,14 +63,11 @@ app.post("/contract", async (req, res) => {
     }
 
     const channel = await client.channels.fetch(CHANNEL_ID);
-    if (!channel || !channel.isTextBased()) {
-      return res.status(404).json({ error: "Salon Discord introuvable" });
-    }
 
-   const embed = new EmbedBuilder()
-.setTitle("📄 Nouvelle demande de contrat")
-.setColor(0x2b2d31)
-.setDescription(
+    const embed = new EmbedBuilder()
+      .setTitle("📄 Nouvelle demande de contrat")
+      .setColor(0x2b2d31)
+      .setDescription(
 `📁 **Dossier**
 **${dossier}**
 
@@ -91,10 +85,9 @@ app.post("/contract", async (req, res) => {
 
 🧠 **Motif**
 ${raison}`
-)
-.setTimestamp();
+      )
+      .setTimestamp();
 
-    
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId("accept")
@@ -107,11 +100,10 @@ ${raison}`
     );
 
     await channel.send({ embeds: [embed], components: [row] });
-
     return res.json({ success: true, dossier });
 
   } catch (err) {
-    console.error("❌ Erreur /contract :", err);
+    console.error(err);
     return res.status(500).json({ error: "Erreur serveur" });
   }
 });
@@ -119,14 +111,34 @@ ${raison}`
 // ================== INTERACTIONS ============
 client.on("interactionCreate", async interaction => {
   if (!interaction.isButton()) return;
+  if (!["accept", "refuse"].includes(interaction.customId)) return;
 
+  const archiveChannel = interaction.guild.channels.cache.get(ARCHIVE_CHANNEL_ID);
+  const accepted = interaction.customId === "accept";
+
+  // 📦 Envoi dans les archives
+  await archiveChannel.send({
+    content: `📁 **Dossier ${accepted ? "ACCEPTÉ ✅" : "REFUSÉ ❌"}**
+👮 Staff : ${interaction.user}`,
+    embeds: interaction.message.embeds
+  });
+
+  // 🔒 Désactiver les boutons
+  const disabledRow = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setLabel("Accepté ✅")
+      .setStyle(ButtonStyle.Success)
+      .setDisabled(true),
+    new ButtonBuilder()
+      .setLabel("Refusé ❌")
+      .setStyle(ButtonStyle.Danger)
+      .setDisabled(true)
+  );
+
+  // 🧾 Modifier le message original (sans supprimer)
   await interaction.update({
-    content:
-      interaction.customId === "accept"
-        ? "✅ Contrat ACCEPTÉ"
-        : "❌ Contrat REFUSÉ",
-    embeds: [],
-    components: []
+    content: `📌 **Dossier ${accepted ? "accepté" : "refusé"}**`,
+    components: [disabledRow]
   });
 });
 
