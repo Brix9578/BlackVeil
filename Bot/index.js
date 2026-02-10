@@ -85,32 +85,29 @@ app.post("/contract", async (req, res) => {
       return res.status(404).json({ error: "Salon Discord introuvable" });
     }
 
+    const dossier = `BV-${Math.floor(100000 + Math.random() * 900000)}`;
+    
     // 📦 Embed Discord
-    const embed = new EmbedBuilder()
-      .setTitle("📄 Nouvelle demande de contrat")
-      .setColor(0x2b2d31)
-      .addFields(
-        {
-          name: "🧑‍💼 Demandeur",
-          value:
-            `**Nom RP :** ${demandeur_nom}\n` +
-            `**Contact RP :** ${demandeur_tel}\n` +
-            `**Type :** ${type_contrat}`
-        },
-        {
-          name: "📝 Raison",
-          value: raison
-        },
-        {
-          name: "🎯 Cible",
-          value:
-            `**Nom RP :** ${cible_nom || "Inconnu"}\n` +
-            `**Contact RP :** ${cible_tel || "Inconnu"}\n` +
-            `**Description :** ${cible_desc || "Aucune information"}`
-        }
-      )
-      .setTimestamp();
+  const embed = new EmbedBuilder()
+  .setTitle("📄 Nouvelle demande de contrat")
+  .setColor(0x2b2d31)
+  .addFields(
+    { name: "📁 Dossier", value: `**${dossier}**`, inline: false },
+    { name: "🧑 Demandeur", value: `${demandeur_nom} (${demandeur_tel})` },
+    { name: "🎯 Cible", value: `${cible_nom} (${cible_tel})` },
+    { name: "📜 Contrat", value: type_contrat },
+    { name: "🧠 Motif", value: raison },
+    {
+      name: "🎯 Détails cible",
+      value:
+        `**Nom RP :** ${cible_nom || "Inconnu"}\n` +
+        `**Contact RP :** ${cible_tel || "Inconnu"}\n` +
+        `**Description :** ${cible_desc || "Aucune information"}`
+    }
+  )
+  .setTimestamp();
 
+    
     // 🎯 Boutons
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
