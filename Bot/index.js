@@ -13,7 +13,7 @@ app.use((req, res, next) => {
 
   // ✅ Répond aux preflight (OPTIONS)
   if (req.method === "OPTIONS") {
-    return res.sendStatus(204);
+    return res.sendStatus(200);
   }
 
   next();
