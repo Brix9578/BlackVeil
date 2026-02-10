@@ -3,7 +3,23 @@ const CHANNEL_ID = "1469524090946846904";
 
 // ================== IMPORTS =================
 const express = require("express");
-const cors = require("cors");
+const app = express();
+
+// ✅ HEADERS CORS MANUELS (OBLIGATOIRE)
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // ✅ Répond aux preflight (OPTIONS)
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
+
+app.use(express.json());
 
 const {
   Client,
@@ -17,19 +33,6 @@ const {
 // ================== LOGS ====================
 console.log("🚀 index.js démarré");
 console.log("🔑 TOKEN PRESENT ?", !!process.env.DISCORD_TOKEN);
-
-// ================== SERVEUR HTTP ============
-const app = express();
-
-// ✅ CORS (OBLIGATOIRE AVANT LES ROUTES)
-app.use(cors({
-  origin: "*",
-  methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type"]
-}));
-
-app.options("*", cors());
-app.use(express.json());
 
 // ================== DISCORD CLIENT ==========
 const client = new Client({
