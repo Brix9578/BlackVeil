@@ -2,12 +2,12 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Suivi de dossier</title>
+    <title>Suivi de dossier – Black Veil Agency</title>
     <style>
         body {
-            background: #000;
-            color: #00ff88;
-            font-family: monospace;
+            background-color: #0b0b0b;
+            color: #00ffcc;
+            font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -15,84 +15,89 @@
         }
 
         .box {
-            width: 320px;
+            border: 1px solid #00ffcc;
+            padding: 30px;
+            width: 350px;
             text-align: center;
+            background: #000;
         }
 
-        h2 {
-            margin-bottom: 20px;
-        }
-
-        input, button {
-            width: 100%;
-            margin-top: 10px;
-            padding: 10px;
+        input {
+            width: 90%;
+            padding: 8px;
+            margin: 10px 0;
             background: #111;
-            border: 1px solid #00ff88;
-            color: #00ff88;
-            font-family: monospace;
+            color: #00ffcc;
+            border: 1px solid #00ffcc;
         }
 
         button {
+            padding: 10px 20px;
+            background: #00ffcc;
+            border: none;
             cursor: pointer;
+            font-weight: bold;
         }
 
         #result {
             margin-top: 20px;
-            min-height: 40px;
-        }
-
-        .small {
-            opacity: 0.6;
-            font-size: 12px;
-            margin-top: 10px;
+            font-size: 16px;
         }
     </style>
 </head>
-
 <body>
-    <div class="box">
-        <h2>📡 Accès sécurisé</h2>
 
-        <input type="text" id="name" placeholder="Nom RP">
-        <input type="text" id="ref" placeholder="Référence dossier">
+<div class="box">
+    <h2>📂 Suivi de dossier</h2>
 
-        <button onclick="check()">Vérifier le statut</button>
+    <input id="name" type="text" placeholder="Nom RP">
+    <input id="ref" type="text" placeholder="Numéro de dossier">
 
-        <div id="result"></div>
+    <button onclick="checkDossier()">Vérifier</button>
 
-        <div class="small">
-            Toute tentative de fraude est enregistrée.
-        </div>
-    </div>
+    <div id="result"></div>
+</div>
 
-    <script>
-        function check() {
-            const name = document.getElementById("name").value.trim();
-            const ref = document.getElementById("ref").value.trim();
+<script>
+async function checkDossier() {
+    const name = document.getElementById("name").value.trim();
+    const ref = document.getElementById("ref").value.trim();
+    const result = document.getElementById("result");
 
-            if (!name || !ref) {
-                document.getElementById("result").innerHTML =
-                    "<span style='color:#ff5555'>❌ Accès refusé – informations incomplètes</span>";
-                return;
-            }
+    if (!name || !ref) {
+        result.innerHTML = "❌ Merci de remplir tous les champs";
+        return;
+    }
 
-            const statuses = [
-                "🟡 EN ATTENTE DE VALIDATION",
-                "🟢 CONTRAT ACCEPTÉ",
-                "🔴 CONTRAT REFUSÉ"
-            ];
+    result.innerHTML = "⏳ Vérification en cours...";
 
-            const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+    try {
+        const response = await fetch(`/suivi?ref=${encodeURIComponent(ref)}&name=${encodeURIComponent(name)}`);
+        const data = await response.json();
 
-            document.getElementById("result").innerHTML = `
-                <p>Dossier <strong>${ref}</strong></p>
-                <p>Statut :</p>
-                <strong>${randomStatus}</strong>
-            `;
+        if (!data.success) {
+            result.innerHTML = `❌ ${data.message}`;
+            return;
         }
-    </script>
+
+        let color = "#ffaa00";
+        if (data.status === "ACCEPTE") color = "#00ff66";
+        if (data.status === "REFUSE") color = "#ff4444";
+
+        result.innerHTML = `
+            <p>Dossier : <strong>${data.ref}</strong></p>
+            <p>Statut :</p>
+            <strong style="color:${color}">${data.status}</strong>
+        `;
+
+    } catch (err) {
+        result.innerHTML = "❌ Erreur serveur";
+    }
+}
+</script>
+
 </body>
 </html>
+
 
 
