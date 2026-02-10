@@ -158,7 +158,7 @@ app.get("/suivi", (req, res) => {
 client.on("interactionCreate", async interaction => {
   if (!interaction.isButton()) return;
 
-  // ✅ RÉPONSE IMMÉDIATE À DISCORD (FINI LES ERREURS)
+  // ✅ ACK immédiat (évite l’échec interaction)
   await interaction.deferUpdate();
 
   const [action, dossierId] = interaction.customId.split("_");
@@ -178,20 +178,23 @@ client.on("interactionCreate", async interaction => {
     });
   }
 
-  const row = new ActionRowBuilder().addComponents(
+  const disabledRow = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
+      .setCustomId("accept_disabled")
       .setLabel("Accepté")
       .setStyle(ButtonStyle.Success)
       .setDisabled(true),
     new ButtonBuilder()
+      .setCustomId("refuse_disabled")
       .setLabel("Refusé")
       .setStyle(ButtonStyle.Danger)
       .setDisabled(true)
   );
 
-  await interaction.editReply({
+  // ✅ LA LIGNE CLÉ (CORRIGÉE)
+  await interaction.message.edit({
     content: `📌 Dossier ${action === "accept" ? "accepté" : "refusé"}`,
-    components: [row]
+    components: [disabledRow]
   });
 });
 
@@ -200,3 +203,4 @@ const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log("🌐 Serveur actif sur le port", PORT));
 
 client.login(process.env.DISCORD_TOKEN);
+
