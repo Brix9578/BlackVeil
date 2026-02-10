@@ -4,13 +4,13 @@ const ARCHIVE_CHANNEL_ID = "1470904139008446485";
 
 // ================== IMPORTS =================
 const express = require("express");
+const fs = require("fs");
 const app = express();
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "https://brix9578.github.io");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
   if (req.method === "OPTIONS") return res.sendStatus(200);
   next();
 });
@@ -35,6 +35,14 @@ client.once("ready", () => {
   console.log("🤖 Bot connecté :", client.user.tag);
 });
 
+// ================== UTILS ==================
+function loadDossiers() {
+  return JSON.parse(fs.readFileSync("dossiers.json", "utf8"));
+}
+function saveDossiers(data) {
+  fs.writeFileSync("dossiers.json", JSON.stringify(data, null, 2));
+}
+
 // ================== ROUTE CONTRACT ==========
 app.post("/contract", async (req, res) => {
   try {
@@ -53,12 +61,17 @@ app.post("/contract", async (req, res) => {
     } = req.body;
 
     if (!demandeur_nom || !demandeur_tel || !type_contrat || !raison) {
-      return res.status(400).json({ error: "Champs demandeur manquants" });
+      return res.status(400).json({ error: "Champs manquants" });
     }
 
-    if (!client.isReady()) {
-      return res.status(503).json({ error: "Bot Discord pas prêt" });
-    }
+    const dossiers = loadDossiers();
+    dossiers[dossier] = {
+      statut: "en_attente",
+      demandeur_nom,
+      type_contrat,
+      date: new Date().toISOString()
+    };
+    saveDossiers(dossiers);
 
     const channel = await client.channels.fetch(CHANNEL_ID);
 
@@ -70,16 +83,14 @@ app.post("/contract", async (req, res) => {
 **${dossier}**
 
 🧑 **Demandeur**
-**Nom RP :** ${demandeur_nom}
-**Contact RP :** ${demandeur_tel}
+${demandeur_nom} — ${demandeur_tel}
 
 🎯 **Cible**
-**Nom RP :** ${cible_nom || "Inconnu"}
-**Contact RP :** ${cible_tel || "Inconnu"}
-**Description :** ${cible_desc || "Aucune information"}
+${cible_nom || "Inconnu"} — ${cible_tel || "Inconnu"}
+${cible_desc || "Aucune info"}
 
-📜 **Contrat**
-**Type :** ${type_contrat}
+📜 **Type**
+${type_contrat}
 
 🧠 **Motif**
 ${raison}`
@@ -87,92 +98,62 @@ ${raison}`
       .setTimestamp();
 
     const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId("accept")
-        .setLabel("Accepter")
-        .setStyle(ButtonStyle.Success),
-
-      new ButtonBuilder()
-        .setCustomId("refuse")
-        .setLabel("Refuser")
-        .setStyle(ButtonStyle.Danger)
+      new ButtonBuilder().setCustomId("accept").setLabel("Accepter").setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("refuse").setLabel("Refuser").setStyle(ButtonStyle.Danger)
     );
 
     await channel.send({ embeds: [embed], components: [row] });
 
-    return res.json({ success: true, dossier });
+    res.json({ success: true, dossier });
 
-  } catch (err) {
-    console.error("❌ Erreur /contract :", err);
-    return res.status(500).json({ error: "Erreur serveur" });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Erreur serveur" });
   }
+});
+
+// ================== SUIVI DOSSIER ==========
+app.get("/suivi/:id", (req, res) => {
+  const dossiers = loadDossiers();
+  const dossier = dossiers[req.params.id];
+
+  if (!dossier) return res.status(404).json({ error: "Introuvable" });
+  res.json(dossier);
 });
 
 // ================== INTERACTIONS ============
 client.on("interactionCreate", async interaction => {
   if (!interaction.isButton()) return;
-
-  // Bloque les anciens boutons désactivés
-  if (interaction.customId.endsWith("_disabled")) {
-    return interaction.reply({
-      content: "⛔ Ce dossier est déjà traité.",
-      ephemeral: true
-    });
-  }
-
   if (!["accept", "refuse"].includes(interaction.customId)) return;
 
-  try {
-    const archiveChannel = interaction.guild.channels.cache.get(ARCHIVE_CHANNEL_ID);
-    if (!archiveChannel) throw new Error("Salon archive introuvable");
+  const accepted = interaction.customId === "accept";
+  const dossiers = loadDossiers();
 
-    const accepted = interaction.customId === "accept";
+  const dossierId = interaction.message.embeds[0]
+    .description.match(/BV-\d{4}-\d{5}/)[0];
 
-    // 📦 ARCHIVE
-    await archiveChannel.send({
-      content: `📁 **Dossier ${accepted ? "ACCEPTÉ ✅" : "REFUSÉ ❌"}**
-👮 Staff : ${interaction.user}`,
-      embeds: interaction.message.embeds
-    });
+  dossiers[dossierId].statut = accepted ? "accepte" : "refuse";
+  saveDossiers(dossiers);
 
-    // 🔒 Boutons désactivés (FIX BUG INTERACTION)
-    const disabledRow = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId("accept_disabled")
-        .setLabel("Accepté ✅")
-        .setStyle(ButtonStyle.Success)
-        .setDisabled(true),
+  const archiveChannel = interaction.guild.channels.cache.get(ARCHIVE_CHANNEL_ID);
+  await archiveChannel.send({
+    content: `📁 **Dossier ${accepted ? "ACCEPTÉ" : "REFUSÉ"}**`,
+    embeds: interaction.message.embeds
+  });
 
-      new ButtonBuilder()
-        .setCustomId("refuse_disabled")
-        .setLabel("Refusé ❌")
-        .setStyle(ButtonStyle.Danger)
-        .setDisabled(true)
-    );
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId("accept_disabled").setLabel("Accepté").setStyle(ButtonStyle.Success).setDisabled(true),
+    new ButtonBuilder().setCustomId("refuse_disabled").setLabel("Refusé").setStyle(ButtonStyle.Danger).setDisabled(true)
+  );
 
-    // 🧾 Update message original
-    await interaction.update({
-      content: `📌 **Dossier ${accepted ? "accepté" : "refusé"}**`,
-      components: [disabledRow]
-    });
-
-  } catch (error) {
-    console.error("❌ Erreur interaction :", error);
-
-    if (!interaction.replied) {
-      await interaction.reply({
-        content: "❌ Une erreur est survenue.",
-        ephemeral: true
-      });
-    }
-  }
+  await interaction.update({
+    content: `📌 Dossier ${accepted ? "accepté" : "refusé"}`,
+    components: [row]
+  });
 });
 
 // ================== START ===================
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () =>
-  console.log("🌐 Serveur actif sur le port", PORT)
-);
-
+app.listen(PORT, () => console.log("🌐 Serveur actif", PORT));
 client.login(process.env.DISCORD_TOKEN);
 
